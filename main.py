@@ -6,7 +6,22 @@ class MerkleTree:
         self.transactions = transactions
 
     def create_merkle_root(self):
-        pass  # TODO
+        hashes = [self.hash_transaction(tx) for tx in self.transactions]
+        while len(hashes) > 1:
+            if len(hashes) % 2 != 0:
+                hashes.append(hashes[-1])  # double up the last hash if odd
+            hashes = [self.hash_pair(hashes[i], hashes[i + 1]) for i in range(0, len(hashes), 2)]
+        return hashes[0] if hashes else None
+
+    @staticmethod
+    def hash_transaction(transaction):
+        tx_string = str(transaction).encode()
+        return hashlib.sha256(tx_string).hexdigest()
+
+    @staticmethod
+    def hash_pair(hash1, hash2):
+        combined = (hash1 + hash2).encode()
+        return hashlib.sha256(combined).hexdigest()
 
 class Block:
     def __init__(self, previous_hash, transactions):
