@@ -31,9 +31,20 @@ class Block:
         self.merkle_root = None
         self.nonce = 0
         self.hash = None
-
+    def calculate_hash(self):
+        block_data = (f"{self.previous_hash}"
+                      f"{self.timestamp}"
+                      f"{self.merkle_root}"
+                      f"{self.nonce}")
+        return hashlib.sha256(block_data.encode()).hexdigest()
     def mine_block(self, difficulty):
-        pass  # TODO
+        self.merkle_root = MerkleTree(self.transactions).create_merkle_root()
+        target = "0" * difficulty
+        while True:
+            self.hash = self.calculate_hash()
+            if self.hash[:difficulty] == target:
+                break
+            self.nonce += 1
 
 class Blockchain:
     def __init__(self, difficulty=4):
